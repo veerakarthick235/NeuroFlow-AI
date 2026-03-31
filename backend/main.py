@@ -6,13 +6,10 @@ from auth import router as auth_router
 from routers.tasks import router as tasks_router
 from routers.ai import router as ai_router
 
-# ✅ CREATE APP FIRST
 app = FastAPI()
 
-# ✅ DATABASE INIT
 Base.metadata.create_all(bind=engine)
 
-# ✅ CORS (AFTER app creation ONLY)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -24,7 +21,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ✅ ROUTES
 app.include_router(auth_router)
 app.include_router(tasks_router)
 app.include_router(ai_router)
