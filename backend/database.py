@@ -1,23 +1,32 @@
 from sqlalchemy import create_engine, event
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import declarative_base, sessionmaker
 from config import get_settings
 
 settings = get_settings()
+DATABASE_URL = settings.DATABASE_URL
 
-# SQLite special handling for check_same_thread
-connect_args = {}
-if settings.DATABASE_URL.startswith("sqlite"):
-    connect_args = {"check_same_thread": False}
+# Detect DB type
+is_sqlite = DATABASE_URL.startswith("sqlite")
 
-engine = create_engine(
-    settings.DATABASE_URL,
-    connect_args=connect_args,
-    echo=False,
-)
+# SQLite config
+connect_args = {"check_same_thread": False} if is_sqlite else {}
 
-# Enable WAL mode for SQLite (better concurrent read performance)
-if settings.DATABASE_URL.startswith("sqlite"):
+# Engine (Postgres + SQLite support)
+if is_sqlite:
+    engine = create_engine(
+        DATABASE_URL,
+        connect_args=connect_args,
+        pool_pre_ping=True
+    )
+else:
+    engine = create_engine(
+        DATABASE_URL,
+        pool_pre_ping=True,
+        connect_args={"sslmode": "require"}  # 🔥 REQUIRED for Supabase
+    )
+
+# SQLite optimizations
+if is_sqlite:
     @event.listens_for(engine, "connect")
     def set_sqlite_pragma(dbapi_connection, connection_record):
         cursor = dbapi_connection.cursor()
@@ -25,10 +34,17 @@ if settings.DATABASE_URL.startswith("sqlite"):
         cursor.execute("PRAGMA foreign_keys=ON")
         cursor.close()
 
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+# Session
+SessionLocal = sessionmaker(
+    autocommit=False,
+    autoflush=False,
+    bind=engine
+)
+
+# Base
 Base = declarative_base()
 
-
+# Dependency
 def get_db():
     db = SessionLocal()
     try:
