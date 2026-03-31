@@ -4,11 +4,12 @@ import os
 origins = [
     "http://localhost:5173",
     "http://localhost:5174",
+    "https://ai-neuro-flow.netlify.app",
 ]
 
-# Add deployed frontend dynamically
+# Optional dynamic addition
 frontend_url = os.getenv("FRONTEND_URL")
-if frontend_url:
+if frontend_url and frontend_url not in origins:
     origins.append(frontend_url)
 
 app.add_middleware(
