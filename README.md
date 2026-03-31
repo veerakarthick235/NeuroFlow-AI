@@ -48,7 +48,7 @@ neuroflow-ai/
 ### Prerequisites
 - Python 3.10+
 - Node.js 18+
-- (Optional) PostgreSQL or just use the zero-config **SQLite** default
+- PostgreSQL (Supabase)
 
 ---
 
@@ -152,7 +152,7 @@ CREATE TABLE tasks (
 
 **Backend:** FastAPI · SQLAlchemy · Pydantic v2 · python-jose (JWT) · passlib (bcrypt) · OpenAI SDK
 
-**Database:** SQLite (default) / PostgreSQL (supported)
+**Database:** PostgreSQL (Supabase)
 
 ---
 
