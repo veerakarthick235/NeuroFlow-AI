@@ -12,18 +12,11 @@ is_sqlite = DATABASE_URL.startswith("sqlite")
 connect_args = {"check_same_thread": False} if is_sqlite else {}
 
 # Engine (Postgres + SQLite support)
-if is_sqlite:
-    engine = create_engine(
-        DATABASE_URL,
-        connect_args=connect_args,
-        pool_pre_ping=True
-    )
-else:
-    engine = create_engine(
-        DATABASE_URL,
-        pool_pre_ping=True,
-        connect_args={"sslmode": "require"}  # 🔥 REQUIRED for Supabase
-    )
+engine = create_engine(
+    DATABASE_URL,
+    pool_pre_ping=True,
+    connect_args={"sslmode": "require"}
+)
 
 # SQLite optimizations
 if is_sqlite:
