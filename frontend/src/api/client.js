@@ -1,11 +1,15 @@
 import axios from 'axios'
 
+// Use environment variable (Netlify) OR fallback to localhost (dev)
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL || 'http://localhost:8001'
+
 const api = axios.create({
-  baseURL: 'http://localhost:8001',
+  baseURL: API_BASE_URL,
   headers: { 'Content-Type': 'application/json' },
 })
 
-// Attach JWT token to every request
+// Attach JWT token
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token')
   if (token) {
@@ -14,7 +18,7 @@ api.interceptors.request.use((config) => {
   return config
 })
 
-// Redirect to login on 401
+// Handle 401
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -27,14 +31,13 @@ api.interceptors.response.use(
   }
 )
 
-// ─── Auth ─────────────────────────────────────────────────────────────────
+// APIs
 export const authAPI = {
   register: (data) => api.post('/register', data),
   login: (data) => api.post('/login', data),
   me: () => api.get('/me'),
 }
 
-// ─── Tasks ────────────────────────────────────────────────────────────────
 export const tasksAPI = {
   list: (params) => api.get('/tasks', { params }),
   create: (data) => api.post('/tasks', data),
@@ -42,7 +45,6 @@ export const tasksAPI = {
   delete: (id) => api.delete(`/tasks/${id}`),
 }
 
-// ─── AI ───────────────────────────────────────────────────────────────────
 export const aiAPI = {
   generateTasks: (goal) => api.post('/generate-tasks', { goal }),
   getInsights: () => api.get('/insights'),
