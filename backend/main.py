@@ -21,7 +21,7 @@ Base.metadata.create_all(bind=engine)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "https://ai-neuro-flow.netlify.app",  # 🔥 REQUIRED
+        "https://ai-neuro-flow.netlify.app",
         "http://localhost:5173",
         "http://localhost:5174",
     ],
